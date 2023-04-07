@@ -1,16 +1,4 @@
 
-    {
-                "id_provider": 2,
-                "first_name_provider": "Семён",
-                "last_name_provider": "Иванов",
-                "day_of_birth": "07.12.1998",
-                "gender_provider": "1",
-                "path_im_provider": "",
-                "phone_number": "88888888888",
-                "city_provider": "Орск"
-    }
-
-
 API
 
 /type-user

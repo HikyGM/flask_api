@@ -16,6 +16,13 @@ def index():
     return '123445'
 
 
+@application.route('/type-user/<int:type_id>', methods=['GET'])
+def one_type_user(type_id):
+    db_sess = db_session.create_session()
+    type = db_sess.query(model.Type_users.Type_users).get(type_id)
+    return jsonify([{"id": type.id_type, "title_type": type.title_type}])
+
+
 @application.route('/type-user', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def type_user():
     db_sess = db_session.create_session()
