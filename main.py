@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_login import LoginManager
 import static.database.__all_models as model
+from flask_restful import reqparse, abort, Api, Resource
 
 from static.database import db_session
 
 application = Flask(__name__)
+api = Api(application)
 login_manager = LoginManager()
 login_manager.init_app(application)
 application.config['SECRET_KEY'] = 'bfy45ue7iuyilutgbkwycu4b7e46ytwu4etriuw34yiuitwyeiut54'
@@ -44,6 +46,7 @@ def get_type_user():
 
 @application.route('/type-user', methods=['POST'])
 def post_type_user():
+    print(request.json)
     if not request.json:
         return jsonify({'error': 'Empty request'})
     elif not all(key in request.json for key in ['title']):
