@@ -8,7 +8,6 @@ __factory = None
 
 
 def global_init():
-    print('я тут')
     global __factory
     if __factory:
         return
