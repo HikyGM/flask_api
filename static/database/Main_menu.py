@@ -1,8 +1,10 @@
 import sqlalchemy
+from sqlalchemy_serializer import SerializerMixin
+
 from .db_session import SqlAlchemyBase
 
 
-class Main_menu(SqlAlchemyBase):
+class Main_menu(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'menu'
 
     id_elem_menu = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

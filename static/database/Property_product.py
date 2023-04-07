@@ -1,9 +1,11 @@
 import sqlalchemy
 from sqlalchemy import orm
+from sqlalchemy_serializer import SerializerMixin
+
 from .db_session import SqlAlchemyBase
 
 
-class Property_product(SqlAlchemyBase):
+class Property_product(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'property_product'
 
     id_property = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

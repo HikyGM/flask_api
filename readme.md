@@ -110,3 +110,22 @@ POST: Добавление продавца
                 "response": "OK",
                 "status": "200"
             }
+
+PUT: Изменение продавца
+
+    запрос:
+            {
+                "first_name_provider": "Семён",
+                "last_name_provider": "Иванов",
+                "day_of_birth": "07.12.1998",
+                "gender_provider": "1",
+                "path_im_provider": "",
+                "phone_number": "88888888888",
+                "city_provider": "Орск"
+            }
+    ответ:
+            {
+                "method": "POST",
+                "response": "OK",
+                "status": "200"
+            }

@@ -1,11 +1,12 @@
 import sqlalchemy
+from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
 from flask_login import UserMixin
 
 
-class Products(SqlAlchemyBase):
+class Products(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'products'
 
     id_products = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

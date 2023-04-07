@@ -1,9 +1,11 @@
 import sqlalchemy
 from sqlalchemy import orm
+from sqlalchemy_serializer import SerializerMixin
+
 from .db_session import SqlAlchemyBase
 
 
-class Selling(SqlAlchemyBase):
+class Selling(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'selling'
 
     id_selling = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

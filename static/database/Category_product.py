@@ -1,9 +1,11 @@
 import sqlalchemy
 from sqlalchemy import orm
+from sqlalchemy_serializer import SerializerMixin
+
 from .db_session import SqlAlchemyBase
 
 
-class Category_product(SqlAlchemyBase):
+class Category_product(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'category_product'
 
     id_category = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

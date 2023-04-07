@@ -1,9 +1,11 @@
 import sqlalchemy
 from sqlalchemy import orm
+from sqlalchemy_serializer import SerializerMixin
+
 from .db_session import SqlAlchemyBase
 
 
-class Providers(SqlAlchemyBase):
+class Providers(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'providers'
 
     id_provider = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

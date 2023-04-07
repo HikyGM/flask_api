@@ -17,76 +17,144 @@ def index():
 
 
 @application.route('/type-user/<int:type_id>', methods=['GET'])
-def one_type_user(type_id):
+def get_one_type_user(type_id):
     db_sess = db_session.create_session()
-    type = db_sess.query(model.Type_users.Type_users).get(type_id)
-    return jsonify([{"id": type.id_type, "title_type": type.title_type}])
+    type_user = db_sess.query(model.Type_users.Type_users).get(type_id)
+    if not type_user:
+        return jsonify({'error': 'Not found'})
+    return jsonify(
+        {
+            'type': type_user.to_dict(only=(
+                'id_type', 'title_type'))
+        }
+    )
 
 
-@application.route('/type-user', methods=['GET', 'POST', 'DELETE', 'PUT'])
-def type_user():
+@application.route('/type-user', methods=['GET'])
+def get_type_user():
     db_sess = db_session.create_session()
-    if request.method == 'GET':
-        return jsonify([{"id": value.id_type, "title_type": value.title_type} for value in
-                        db_sess.query(model.Type_users.Type_users).all()])
+    return jsonify(
+        {
+            'types':
+                [item.to_dict(only=('id_type', 'title_type'))
+                 for item in db_sess.query(model.Type_users.Type_users).all()]
+        }
+    )
 
-    elif request.method == 'POST':
-        if not request.json['title']:
-            return jsonify('Bed request')
-        title = request.json['title']
-        type = model.Type_users.Type_users()
-        type.title_type = title
-        db_sess.merge(type)
+
+@application.route('/type-user', methods=['POST'])
+def post_type_user():
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in ['title']):
+        return jsonify({'error': 'Bad request'})
+    db_sess = db_session.create_session()
+    type_user = model.Type_users.Type_users()
+    if not db_sess.query(model.Type_users.Type_users).filter(
+            model.Type_users.Type_users.title_type == request.json['title']).first():
+        type_user.title_type = request.json['title']
+        db_sess.merge(type_user)
         db_sess.commit()
-        return jsonify({'response': 'OK', 'method': request.method, 'title_type': title, 'status': 'успешно добавлен'})
+        return jsonify({'success': 'OK'})
+    else:
+        return jsonify({'error': 'The entity already exists'})
 
-    elif request.method == 'DELETE':
-        id = request.json['id']
-        if not id:
-            return jsonify('Bed request')
-        query = db_sess.query(model.Type_users.Type_users).get(id)
+
+@application.route('/type-user/<int:id_type>', methods=['PUT'])
+def put_type_user(id_type):
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in ['title']):
+        return jsonify({'error': 'Bad request'})
+    db_sess = db_session.create_session()
+    if not db_sess.query(model.Type_users.Type_users).filter(
+            model.Type_users.Type_users.title_type == request.json['title']).first():
+        type = db_sess.query(model.Type_users.Type_users).get(id_type)
+        if type:
+            type.title_type = request.json['title']
+            db_sess.merge(type)
+            db_sess.commit()
+            return jsonify({'success': 'OK'})
+        else:
+            return jsonify({'error': 'Bad request'})
+    else:
+        return jsonify({'error': 'The entity already exists'})
+
+
+@application.route('/type-user/<int:id_type>', methods=['DELETE'])
+def delete_type_user(id_type):
+    db_sess = db_session.create_session()
+    query = db_sess.query(model.Type_users.Type_users).get(id_type)
+    if query:
         db_sess.delete(query)
         db_sess.commit()
-        return jsonify(
-            {'response': 'OK', 'method': request.method, 'title_type': query.title_type, 'status': 'успешно удалён'})
-
-    elif request.method == 'PUT':
-        id = request.json['id']
-        new_title = request.json['title']
-        if not id:
-            return jsonify('Bed request')
-        type = db_sess.query(model.Type_users.Type_users).get(id)
-        old_title = type.title_type
-        type.title_type = new_title
-        db_sess.merge(type)
-        db_sess.commit()
-        return jsonify(
-            {'response': 'OK', 'method': request.method, 'title_type': type.title_type, "old_title_type": old_title,
-             'status': 'успешно изменён'})
+        return jsonify({'success': 'OK'})
+    else:
+        return jsonify({'error': 'Not found'})
 
 
-@application.route('/providers', methods=['GET', 'POST', 'DELETE', 'PUT'])
-def providers():
+@application.route('/providers/<int:id_provider>', methods=['GET'])
+def get_one_provider(id_provider):
     db_sess = db_session.create_session()
-    if request.method == 'GET':
-        res = []
-        for value in db_sess.query(model.Providers.Providers).all():
-            res.append({
-                "id_provider": value.id_provider,
-                "first_name_provider": value.first_name_provider,
-                "last_name_provider": value.last_name_provider,
-                "day_of_birth": value.day_of_birth,
-                "gender_provider": value.gender_provider,
-                "path_im_provider": value.path_im_provider,
-                "phone_number": value.phone_number,
-                "city_provider": value.city_provider
-            })
-        return jsonify(res)
+    provider = db_sess.query(model.Providers.Providers).get(id_provider)
+    if not provider:
+        return jsonify({'error': 'Not found'})
+    return jsonify(
+        {
+            'provider': provider.to_dict(only=(
+                'id_provider', 'first_name_provider', 'last_name_provider', 'day_of_birth', 'gender_provider',
+                'path_im_provider', 'phone_number', 'city_provider'))
 
-    elif request.method == 'POST':
-        if not request.json:
-            return jsonify('Bed request')
-        provider = model.Providers.Providers()
+        }
+    )
+
+
+@application.route('/providers', methods=['GET'])
+def get_providers():
+    db_sess = db_session.create_session()
+    return jsonify(
+        {
+            'providers':
+                [item.to_dict(only=(
+                    'id_provider', 'first_name_provider', 'last_name_provider'))
+                    for item in db_sess.query(model.Providers.Providers).all()]
+        }
+    )
+
+
+@application.route('/providers', methods=['POST'])
+def post_provider():
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ['first_name_provider', 'last_name_provider', 'day_of_birth', 'gender_provider',
+                  'path_im_provider', 'phone_number', 'city_provider']):
+        return jsonify({'error': 'Bad request'})
+    db_sess = db_session.create_session()
+    provider = model.Providers.Providers()
+    provider.first_name_provider = request.json['first_name_provider']
+    provider.last_name_provider = request.json['last_name_provider']
+    provider.day_of_birth = request.json['day_of_birth']
+    provider.gender_provider = request.json['gender_provider']
+    provider.path_im_provider = request.json['path_im_provider']
+    provider.phone_number = request.json['phone_number']
+    provider.city_provider = request.json['city_provider']
+    db_sess.merge(provider)
+    db_sess.commit()
+    return jsonify({'success': 'OK'})
+
+
+@application.route('/providers/<int:id_provider>', methods=['PUT'])
+def put_provider(id_provider):
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ['first_name_provider', 'last_name_provider', 'day_of_birth', 'gender_provider',
+                  'path_im_provider', 'phone_number', 'city_provider']):
+        return jsonify({'error': 'Bad request'})
+    db_sess = db_session.create_session()
+    provider = db_sess.query(model.Providers.Providers).get(id_provider)
+    if provider:
         provider.first_name_provider = request.json['first_name_provider']
         provider.last_name_provider = request.json['last_name_provider']
         provider.day_of_birth = request.json['day_of_birth']
@@ -96,22 +164,21 @@ def providers():
         provider.city_provider = request.json['city_provider']
         db_sess.merge(provider)
         db_sess.commit()
-        return jsonify({'response': 'OK', 'method': request.method, 'status': '200'})
+        return jsonify({'success': 'OK'})
+    else:
+        return jsonify({'error': 'Not found'})
 
-    elif request.method == 'PUT':
-        if not request.json:
-            return jsonify('Bed request')
-        provider = db_sess.query(model.Providers.Providers).get(request.json['id_provider'])
-        provider.first_name_provider = request.json['first_name_provider']
-        provider.last_name_provider = request.json['last_name_provider']
-        provider.day_of_birth = request.json['day_of_birth']
-        provider.gender_provider = request.json['gender_provider']
-        provider.path_im_provider = request.json['path_im_provider']
-        provider.phone_number = request.json['phone_number']
-        provider.city_provider = request.json['city_provider']
-        db_sess.merge(provider)
+
+@application.route('/providers/<int:id_provider>', methods=['DELETE'])
+def delete_provider(id_provider):
+    db_sess = db_session.create_session()
+    provider = db_sess.query(model.Providers.Providers).get(id_provider)
+    if provider:
+        db_sess.delete(provider)
         db_sess.commit()
-        return jsonify({'response': 'OK', 'method': request.method, 'status': '200'})
+        return jsonify({'success': 'OK'})
+    else:
+        return jsonify({'error': 'Not found'})
 
 
 def main():
