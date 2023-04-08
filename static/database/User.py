@@ -27,7 +27,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def set_password(self, password):
         self.password_user = generate_password_hash(password)
-        return generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_user, password)

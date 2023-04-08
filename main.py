@@ -219,13 +219,14 @@ def post_posts():
                   'text_post']):
         return jsonify({'error': 'Bad request'})
     db_sess = db_session.create_session()
-    post = model.Blog.Blog()
-    post.title_post = request.json['title_post']
-    post.author_post = request.json['author_post']
-    post.data_time_post = request.json['data_time_post']
-    post.path_im_post = request.json['path_im_post']
-    post.text_post = request.json['text_post']
-    db_sess.merge(post)
+    post = model.Blog.Blog(
+        title_post=request.json['title_post'],
+        author_post=request.json['author_post'],
+        data_time_post=request.json['data_time_post'],
+        path_im_post=request.json['path_im_post'],
+        text_post=request.json['text_post']
+    )
+    db_sess.add(post)
     db_sess.commit()
     return jsonify({'success': 'OK'})
 
@@ -320,21 +321,49 @@ def register_user():
         errors['password'] = "Passwords don't match"
     if errors:
         return jsonify(errors)
-    add_user = user()
-    add_user.login_user = request.json['login_user']
-    add_user.password_user = user.set_password(user, request.json['password_user'])
-    add_user.email_user = request.json['email_user']
-    add_user.first_name_user = request.json['first_name_user']
-    add_user.last_name_user = request.json['last_name_user']
-    add_user.day_of_birth = request.json['day_of_birth']
-    add_user.gender_user = request.json['gender_user']
-    if 'path_im_user' in request.json:
-        add_user.path_im_user = request.json['path_im_user']
-    add_user.phone_number = request.json['phone_number']
-    add_user.city_user = request.json['city_user']
-    db_sess.merge(add_user)
+    add_user = user(
+        login_user=request.json['login_user'],
+        email_user=request.json['email_user'],
+        first_name_user=request.json['first_name_user'],
+        last_name_user=request.json['last_name_user'],
+        day_of_birth=request.json['day_of_birth'],
+        gender_user=request.json['gender_user'],
+        phone_number=request.json['phone_number'],
+        city_user=request.json['city_user'],
+    )
+    add_user.set_password(request.json['password_user'])
+    # add_user.login_user = request.json['login_user']
+    # # Тут явно проблема, метод принимает сам объект и пароль, по другому не робит
+    # add_user.password_user = user.set_password(add_user, request.json['password_user'])
+    # add_user.email_user = request.json['email_user']
+    # add_user.first_name_user = request.json['first_name_user']
+    # add_user.last_name_user = request.json['last_name_user']
+    # add_user.day_of_birth = request.json['day_of_birth']
+    # add_user.gender_user = request.json['gender_user']
+    # if 'path_im_user' in request.json:
+    #     add_user.path_im_user = request.json['path_im_user']
+    # add_user.phone_number = request.json['phone_number']
+    # add_user.city_user = request.json['city_user']
+    db_sess.add(add_user)
     db_sess.commit()
     return jsonify({'success': 'OK'})
+
+
+@application.route('/login', methods=['POST'])
+def login_user():
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ['login', 'password']):
+        return jsonify({'error': 'Bad request'})
+    no_value = {key: 'No value' for key, value in request.json.items() if not value}
+    if no_value:
+        return jsonify(no_value)
+    db_sess = db_session.create_session()
+    check_user = db_sess.query(model.User.User).filter(model.User.User.login_user == request.json['login']).first()
+    if not check_user and not check_user.check_password(request.json['password']):
+        return jsonify({'errors': 'The user does not exist'})
+    return jsonify({'success': 'OK', 'id_user': check_user.id_user})
 
 
 def main():
