@@ -72,10 +72,10 @@ def put_type_user(id_type):
     db_sess = db_session.create_session()
     if not db_sess.query(model.Type_users.Type_users).filter(
             model.Type_users.Type_users.title_type == request.json['title']).first():
-        type = db_sess.query(model.Type_users.Type_users).get(id_type)
-        if type:
-            type.title_type = request.json['title']
-            db_sess.merge(type)
+        _type = db_sess.query(model.Type_users.Type_users).get(id_type)
+        if _type:
+            _type.title_type = request.json['title']
+            db_sess.merge(_type)
             db_sess.commit()
             return jsonify({'success': 'OK'})
         else:
