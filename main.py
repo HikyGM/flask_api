@@ -332,18 +332,8 @@ def register_user():
         city_user=request.json['city_user'],
     )
     add_user.set_password(request.json['password_user'])
-    # add_user.login_user = request.json['login_user']
-    # # Тут явно проблема, метод принимает сам объект и пароль, по другому не робит
-    # add_user.password_user = user.set_password(add_user, request.json['password_user'])
-    # add_user.email_user = request.json['email_user']
-    # add_user.first_name_user = request.json['first_name_user']
-    # add_user.last_name_user = request.json['last_name_user']
-    # add_user.day_of_birth = request.json['day_of_birth']
-    # add_user.gender_user = request.json['gender_user']
-    # if 'path_im_user' in request.json:
-    #     add_user.path_im_user = request.json['path_im_user']
-    # add_user.phone_number = request.json['phone_number']
-    # add_user.city_user = request.json['city_user']
+    if 'path_im_user' in request.json:
+        add_user.path_im_user = request.json['path_im_user']
     db_sess.add(add_user)
     db_sess.commit()
     return jsonify({'success': 'OK'})
@@ -373,4 +363,3 @@ def main():
 if __name__ == "__main__":
     main()
     application.run(host='0.0.0.0', port=8080)
-
