@@ -230,6 +230,41 @@ def post_posts():
     return jsonify({'success': 'OK'})
 
 
+@application.route('/posts/<int:id_post>', methods=['PUT'])
+def put_posts(id_post):
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ['title_post', 'author_post', 'data_time_post', 'path_im_post',
+                  'text_post']):
+        return jsonify({'error': 'Bad request'})
+    db_sess = db_session.create_session()
+    post = db_sess.query(model.Blog.Blog).get(id_post)
+    if post:
+        post.title_post = request.json['title_post']
+        post.author_post = request.json['author_post']
+        post.data_time_post = request.json['data_time_post']
+        post.path_im_post = request.json['path_im_post']
+        post.text_post = request.json['text_post']
+        db_sess.merge(post)
+        db_sess.commit()
+        return jsonify({'success': 'OK'})
+    else:
+        return jsonify({'error': 'Not found'})
+
+
+@application.route('/posts/<int:id_post>', methods=['DELETE'])
+def delete_posts(id_post):
+    db_sess = db_session.create_session()
+    post = db_sess.query(model.Blog.Blog).get(id_post)
+    if post:
+        db_sess.delete(post)
+        db_sess.commit()
+        return jsonify({'success': 'OK'})
+    else:
+        return jsonify({'error': 'Not found'})
+
+
 def main():
     db_session.global_init()
 
