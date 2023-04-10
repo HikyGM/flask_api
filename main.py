@@ -339,6 +339,7 @@ def register_user():
     return jsonify({'success': 'OK'})
 
 
+
 @application.route('/login', methods=['POST'])
 def login_user():
     if not request.json:
@@ -351,9 +352,14 @@ def login_user():
         return jsonify(no_value)
     db_sess = db_session.create_session()
     check_user = db_sess.query(model.User.User).filter(model.User.User.login_user == request.json['login']).first()
-    if not check_user and not check_user.check_password(request.json['password']):
+    if not check_user :
         return jsonify({'errors': 'The user does not exist'})
-    return jsonify({'success': 'OK', 'id_user': check_user.id_user})
+    if not check_user.check_password(request.json['password']):
+        return jsonify({'errors': 'The user does not exist'})
+    return jsonify(check_user.to_dict(only=(
+        'id_user', 'login_user', 'email_user', 'first_name_user', 'last_name_user',
+        'day_of_birth', 'gender_user', 'path_im_user', 'phone_number', 'city_user',
+        'type_user')))
 
 
 @application.route('/category-product/<int:id_category>', methods=['GET'])
