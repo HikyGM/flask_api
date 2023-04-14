@@ -1,9 +1,7 @@
 import sqlalchemy
 from sqlalchemy_serializer import SerializerMixin
-from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
-from flask_login import UserMixin
 
 
 class Products(SqlAlchemyBase, SerializerMixin):
@@ -18,7 +16,5 @@ class Products(SqlAlchemyBase, SerializerMixin):
     category_product = orm.relationship('Category_product')
     manufacturer = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('manufacturer_product.id_manufacturer'))
     manufacturer_product = orm.relationship('Manufacturer_product')
-
     property = orm.relationship("Property_product", back_populates='property_product')
-
-    # blog = orm.relation("Blog", back_populates='author')
+    path_image = sqlalchemy.Column(sqlalchemy.String, default='static/images/nonePhoto.png')
